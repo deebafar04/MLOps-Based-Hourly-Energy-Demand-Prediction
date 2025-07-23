@@ -1,72 +1,169 @@
-# Capstone Project for Data Engineering Zoomcamp and MLOps Zoomcamp
 
-This is my capstone project for both the Data Engineering Zoomcamp and the MLOps Zoomcamp from Data Talks Club.  Course work and notes for the DE Zoomcamp are in [this other repo](https://github.com/mharty3/data_engineering_zoomcamp_2022).
+# ⚡ Hourly Energy Demand Forecasting with MLOps
 
-## Objective
-With few exceptions, electricity must be generated at the same time it is needed. This creates a challenge for electrical grid operators who have to make a plan to generate the electricity their customers need each hour. Accurately forecasting energy demand is critical for grid operators so they can appropriately plan to meet the generation needs of their customers.
+This project delivers a scalable, production-ready machine learning pipeline to forecast **hourly electricity demand** using weather and energy grid data. It combines modern data engineering principles, orchestration, and AI lifecycle management to support smarter, more responsive energy infrastructure.
 
-This project utilizes Data Engineering and Machine Learning Operations (MLOps) concepts to build a system for forecasting hourly electricity demand in my region of Colorado. Implementing the project demonstrates the data skills I learned in the Data Talks Club's Zoomcamps. 
+---
 
-### Data Engineering
-I applied data engineering and EtLT concepts from the modern data stack including workflow orchestration with Airflow, cloud data warehousing and data lake storage on Google Cloud, and data transformation with dbt. I used these concepts and tools to build a data pipeline that populates a Big Query data warehouse with the data a data scientist needs to make develop an hourly day-ahead demand forecast. 
+## 📌 Project Summary
 
-![](img/de_architecture.PNG)
+- 📈 Forecasts short-term electricity demand at the hourly level
+- 🔄 Automates ingestion, transformation, and prediction cycles
+- 🧱 Built with modular tools: Airflow, dbt, MLflow, Streamlit, Terraform
+- 🎯 Supports energy analysts and grid operators with actionable insights
+- ✅ Designed for reproducibility, monitoring, and real-world impact
 
-### MLOps
-Once the data pipeline was running, I used concepts and tools from MLOps to build a system for developing, deploying, and monitoring machine learning models that predict hourly energy demand. I used experiment tracking and model registration with MLFlow, batch model deployment with Airflow, and model monitoring with dbt and Streamlit.
+---
 
-![](img/mlops_architecture.PNG)
+## 🧠 Why It Matters
 
-
-
-## High level requirements
-
-* The system should allow users to access historical electricity demand, EIA demand forecasts, historical weather data, and up-to-date weather forecast data in a Big Query data warehouse
-* The scope will be limited to the Public Service Company of Colorado Balancing Authority (aka Xcel Energy)
-* There should be an interactive dashboard to interact and visualize the data that is being loaded into the data warehouse
-* An MLFlow tracking server, artifact storage, and model registry should be used to track the models that are being developed and deployed
-* Production models should be deployed from the model registry to Airflow for batch model deployment
-* Model performance metrics should be tracked and visualized in a dashboard
+Electricity must be generated at the exact moment it’s consumed. For grid operators, even minor demand spikes can cause waste or shortages. This project solves that challenge by predicting future electricity needs using weather and historical load data, enabling more efficient generation planning.
 
 
-## Data Sources
-Notebooks exploring each of these data sources can be found [here](00_data_source_exploration)
+## 🧱 System Architecture: End-to-End Workflow
 
-* Electricity Demand and Generation - [EIA Open Data](https://www.eia.gov/opendata/)
-  * The United States Energy Information Administration (EIA) provides open access to hundreds of thousands of time series datasets via a REST API. The data is in the public domain, and requires [registraton and an API key](https://www.eia.gov/opendata/register.php).
+> ![Architecture](img/de_architecture.PNG)
 
-* Historical Weather Data - [NOAA Integrated Surface Data](https://registry.opendata.aws/noaa-isd/)
-  * The United States National Oceanic and Atmospheric Administration (NOAA) maintins the Integrated Surface Database (ISD) with global hourly weather station observations from nearly 30,000 stations. The data is available in csv format in open AWS S3 bucket.
+The system is designed as a modular, scalable pipeline that mirrors enterprise-grade data workflows.
 
-* Live weather data - [Open Weather Map API](https://openweathermap.org/)
-  * Live weather observation data for anywhere on the globe is available for free (with certain API call limits) via the Open Weather Map REST API.
+1. **Data Ingestion**: Raw data is pulled from APIs (OpenWeatherMap, EIA) or CSVs (NOAA) and stored in cloud buckets.
+2. **Transformation Layer**: dbt standardizes, stages, and tests the data into analytics-ready models. Airflow DAGs orchestrate these jobs.
+3. **Modeling**: Forecasting models are trained using scikit-learn and logged with MLflow for experiment tracking, version control, and registry.
+4. **Monitoring and Visualization**: Streamlit dashboards track predictions, detect drift, and allow for region-based exploration of forecast performance.
+5. **Infrastructure**: Everything runs on Dockerized environments and provisioned via Terraform onto GCP.
 
-* Weather Forecast Data - [NOAA National Digital Forecast Database](https://registry.opendata.aws/noaa-ndfd/)
-  * NOAA maintains the National Digital Forecast Database (NDFD) which is a suite of gridded forecasts of weather conditions for the United States. The data is available in gridded format in an open AWS S3 bucket or via XML from a REST API.
-
-## Technologies and Tools
-- Cloud - [**Google Cloud Platform**](https://cloud.google.com)
-- Infrastructure as Code - [**Terraform**](https://www.terraform.io)
-- Containerization - [**Docker**](https://www.docker.com) and [**Docker Compose**](https://docs.docker.com/compose/)
-- Workflow Orchestration - [**Airflow**](https://airflow.apache.org)
-- Pre-Load Transformation - [**pandas**](https://pandas.pydata.org/) and [**pyarrow**](https://arrow.apache.org/docs/python/index.html)
-- Data Lake - [**Google Cloud Storage**](https://cloud.google.com/storage)
-- Data Warehouse - [**BigQuery**](https://cloud.google.com/bigquery)
-- Post-Load Transformation - [**dbt**](https://www.getdbt.com)
-- Data Visualization/Dashboard - [**Streamlit**](https://streamlit.io/) and [**Plotly Express**](https://plotly.com/python/plotly-express/) and [**hvplot**](https://hvplot.holoviz.org/)
-- Model Development, Experiment Tracking, and Registration - [**scikit-learn**](https://scikit-learn.org/) and [**MLflow**](https://www.mlflow.org/)
-- Model Deployment - Batch Deployment with [**Airflow**](https://airflow.apache.org)
-- Model Monitoring - [**dbt**](https://www.getdbt.com) and [**Streamlit**](https://streamlit.io/)
+This modularity allows flexible development and deployment while preserving reproducibility and observability across the entire stack.
 
 
+---
 
-## Data and Forecast Dashboard
-[Link](https://share.streamlit.io/mharty3/energy_data_capstone/04_dashboard/app.py)
+## 🔄 MLOps Workflow
 
-Note: I am running low on free GCP credits, so by the time you read this, the apps may no longer work.
+> ![MLOps](img/mlops_architecture.PNG)
 
-![](img/dashboard1.PNG)
+The project follows a modular MLOps design:
+- **Ingestion & Orchestration** via Airflow DAGs
+- **Transformation** using dbt with test coverage
+- **Model Training & Tuning** using MLflow
+- **Monitoring** with dashboards and drift detection
+- **Deployment** using batch jobs and version control
 
-## Monitoring Dashboard
-[Link](https://mharty3-energy-data-capstone-07-monitoringapp-o8dnn1.streamlitapp.com/)
-![](img/monitoring_dashboard_1.PNG)
+---
+
+## ⚙️ Technology Stack
+
+| Layer                  | Tools & Frameworks                                          |
+|------------------------|--------------------------------------------------------------|
+| **Infrastructure**     | Terraform, Docker, GCP VMs, Cloud Storage                    |
+| **Ingestion & Workflow** | Python, Airflow, Weather APIs, Postgres                    |
+| **Transformation**     | dbt, Spark, PySpark, SQL                                     |
+| **Modeling**           | scikit-learn, MLflow, pandas, time-series regressors         |
+| **Monitoring & Reporting** | Streamlit, Plotly, dbt, alert logic                     |
+
+---
+
+## 🔍 Data Sources
+
+| Source                             | Description                                                               |
+|------------------------------------|---------------------------------------------------------------------------|
+| [EIA Open Data](https://www.eia.gov/opendata/)                      | Hourly electricity load & forecast data                                   |
+| [NOAA ISD](https://registry.opendata.aws/noaa-isd/)                           | Historical hourly weather observations from 30,000+ global stations       |
+| [OpenWeatherMap API](https://openweathermap.org/api)                 | Live weather observation data via REST API                                |
+| [NOAA NDFD](https://registry.opendata.aws/noaa-ndfd/)                          | Gridded weather forecasts in XML and CSV format                           |
+
+---
+
+## 🗂️ Project Modules
+
+| Folder                        | Purpose                                                                  |
+|------------------------------|--------------------------------------------------------------------------|
+| `01_data_ingestion/`         | API ingestion + CSV parsing for weather + grid data                      |
+| `02_infra_terraform/`        | Infrastructure provisioning for compute/storage                          |
+| `03_pipeline_airflow/`       | Airflow DAGs to schedule data loads and batch predictions                |
+| `04_transform_dbt/`          | dbt models to normalize and stage data                                   |
+| `05_dashboard_streamlit/`    | Frontend visualization of actual vs. predicted energy usage              |
+| `06_model_training_mlflow/`  | Model development notebooks, MLflow integration                          |
+| `07_deployment_scripts/`     | Batch scoring jobs                                                        |
+| `08_monitoring_alerts/`      | Dashboard & drift detection interface                                    |
+
+---
+
+## 🧪 Experiment Tracking
+
+> ![MLflow](img/mlflow1.PNG)
+
+- All experiments logged using **MLflow**
+- Model registry tracks production-ready vs. candidate models
+- Feature versions and forecast metrics tracked across runs
+
+---
+
+## 📊 Dashboards
+
+> ![Dashboard](img/dashboard1.PNG)
+
+- Forecast vs. actual demand, weather overlays
+- Region and time-range filtering
+- Error tracking and outlier display
+
+> ![Monitoring](img/monitoring_dashboard_1.PNG)
+
+- Live pipeline health status
+- Drift detection based on recent prediction deltas
+- Alerts for schema changes or data freshness issues
+
+---
+
+## 🛠 How to Reproduce
+
+```bash
+# Clone the repository
+git clone https://github.com/deebafar04/MLOps-Based-Hourly-Energy-Demand-Prediction.git
+cd MLOps-Based-Hourly-Energy-Demand-Prediction
+
+# Launch Airflow for pipeline execution
+cd 03_pipeline_airflow
+docker-compose up
+
+# Run dbt transformations
+cd 04_transform_dbt
+dbt run
+
+# Train models with MLflow logging
+cd 06_model_training_mlflow
+jupyter notebook
+
+# Launch dashboard
+cd 05_dashboard_streamlit
+streamlit run app.py
+```
+
+---
+
+## 📈 Forecasting Techniques Used
+
+- Feature engineering with lag variables and weather features
+- Linear regression and ensemble methods (scikit-learn)
+- Time-series cross-validation
+- Bias monitoring and retraining triggers
+
+---
+
+## 📚 What This Project Demonstrates
+
+- ✅ Modern orchestration and model lifecycle design
+- ✅ Real-world energy and weather domain complexity
+- ✅ Automated ingestion, tracking, and dashboarding
+- ✅ Attention to testing, reproducibility, and deployment
+
+
+---
+
+## 👩🏻‍💻 About the Author
+
+I'm **Deeba Farheen H N**, a data engineer and former software developer currently pursuing my M.S. in Data Science at the University of Michigan. I’ve worked on complex data platforms at Amazon, Calyx, and Parexel, and I love building scalable data systems that create real-world impact.
+
+- 🔗 [LinkedIn Profile](https://linkedin.com/in/deeba-farheen-h-n)
+- 💻 [GitHub Portfolio](https://github.com/deebafar04)
+- 📫 [Email Me](mailto:deebafar04@gmail.com)
+
